@@ -1,14 +1,12 @@
-const sqlite3 = require("sqlite3").verbose();
+const Database = require("better-sqlite3");
+const path = require("path");
 
-const db = new sqlite3.Database("./bookings.db", (err) => {
-  if (err) {
-    console.error("DB Error:", err.message);
-  } else {
-    console.log("Connected to SQLite database.");
-  }
-});
+const dbPath = path.join(__dirname, "database.db");
+const db = new Database(dbPath);
 
-db.run(`
+console.log("Connected to SQLite database.");
+
+db.prepare(`
   CREATE TABLE IF NOT EXISTS bookings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
@@ -16,6 +14,6 @@ db.run(`
     date TEXT,
     message TEXT
   )
-`);
+`).run();
 
 module.exports = db;

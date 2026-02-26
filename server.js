@@ -18,25 +18,18 @@ app.post("/api/book", (req, res) => {
 
   const sql = `INSERT INTO bookings (name, email, date, message) VALUES (?, ?, ?, ?)`;
 
-  db.run(sql, [name, email, date, message], function (err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
+  const stmt = db.prepare(sql);
+const info = stmt.run(name, email, date, message);
 
-    res.json({ success: true, bookingId: this.lastID });
-  });
+res.json({ success: true, bookingId: info.lastInsertRowid });
 });
 
 // Get all bookings (admin)
 app.get("/api/bookings", (req, res) => {
-  db.all(`SELECT * FROM bookings ORDER BY id DESC`, [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-
-    res.json(rows);
+  const rows = db.prepare("SELECT * FROM bookings ORDER BY id DESC").all();
+res.json(rows);
   });
-});
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
